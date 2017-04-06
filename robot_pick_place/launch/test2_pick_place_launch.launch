@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<launch>
+
+       <!-- start the transform broadcaster for broadcasting LMS400 position/orientation -->
+    <node pkg="tf_setup" type="robot_pose_broadcaster" name="robot_pose_broadcaster" output="screen">
+     </node>
+
+       <!-- start the plc modbus interface node. set the read and write addresses in the plc -->
+    <node pkg="plc_modbus_node" type="ros_plc_modbus" name="plc_modbus_node" output="screen">
+        <param name="ip" value="192.168.0.15"/>
+        <rosparam param="coils_addr">[1,2,3,4,5,6,7,8]</rosparam>
+        <rosparam param="regs_addr">[1,2,3,4,5,6,7,20,21]</rosparam>
+        <rosparam param="write_coils_addr">[1,2,3,4]</rosparam>
+        <rosparam param="write_regs_addr">[60,61,62,63]</rosparam>
+     </node>
+
+       <!-- Start the LMS400 driver -->
+     <node pkg="sick_lms400" type="lms400_node" name="lms400_node" output="screen"> 
+     <param name="enable_laser" type="bool" value="true"/>
+     </node>
+
+       <!-- convert the laserScan data type to PointCloud data type -->
+     <node pkg="scan_to_pcl" type="scan_to_cloud" name="scan_to_cloud" output="screen">
+     </node>
+
+       <!-- star the point cloud laser assembler -->
+     <node type="point_cloud_assembler" pkg="laser_assembler" name="my_assembler">
+     <remap from="cloud" to="my_cloud"/>
+     <param name="max_clouds" type="int" value="4000000" />
+     <param name="fixed_frame" type="string" value="base_link" />
+     </node>
+
+       <!-- Run the service client to call the assembled point clouds and convert from PointCloud to PointCloud2 -->
+      <node pkg="build_3d_pcl" type="pcl_3d" name="pcl_3d" output="screen" />
+
+       <!--Run the point cloud filter package that filters the PointCloud2 data sets -->
+      <node pkg="point_cloud_filter" type="test_pcl_filter" name="test_pcl_filter" output="screen" />
+
+
+
+
+
+</launch>
+
+
+

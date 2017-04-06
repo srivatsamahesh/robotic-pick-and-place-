@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<launch>
+
+       <!-- start the transform broadcaster for broadcasting LMS400 position/orientation -->
+     <node pkg="tf_setup" type="test_broadcaster" name="test_broadcaster" output="screen">
+     </node>
+
+       <!-- Start the LMS400 driver -->
+     <node pkg="sick_lms400" type="lms400_node" name="lms400_node" output="screen"> 
+     <param name="enable_laser" type="bool" value="true"/>
+     </node>
+
+       <!-- convert the laserScan data type to PointCloud data type -->
+     <node pkg="scan_to_pcl" type="scan_to_cloud" name="scan_to_cloud" output="screen">
+     </node>
+
+       <!-- star the point cloud laser assembler -->
+     <node type="point_cloud_assembler" pkg="laser_assembler" name="my_assembler">
+     <remap from="cloud" to="my_cloud"/>
+     <param name="max_clouds" type="int" value="4000000" />
+     <param name="fixed_frame" type="string" value="base_link" />
+     </node>
+
+       <!-- Run the service client to call the assembled point clouds and convert from PointCloud to PointCloud2 -->
+  <node pkg="build_3d_pcl" type="pcl_3d" name="pcl_3d" output="screen" />
+
+       <!-- start all the filter nodelets-->
+  <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+
+       <!-- Run a VoxelGrid filter to clean NaNs and downsample the data -->
+  <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid pcl_manager" output="screen">
+    <remap from="~input" to="/assembled_cloud2" />
+    <rosparam>
+      filter_field_name: z
+      filter_limit_min: 0.0
+      filter_limit_max: 15.0
+      filter_limit_negative: False
+      leaf_size: 0.02
+    </rosparam>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="cropbox_jb1" args="load pcl/CropBox pcl_manager" output="screen">
+  <remap from="~input" to="/voxel_grid/output"/>
+      <rosparam>min_x: -0.1</rosparam>
+      <rosparam>max_x: 0.1</rosparam>
+      <rosparam>min_y: 0.1</rosparam>
+      <rosparam>max_y: 0.2</rosparam>
+      <rosparam>min_z: 0.1</rosparam>
+      <rosparam>max_z: 0.2</rosparam>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="cropbox_jb2" args="load pcl/CropBox pcl_manager" output="screen">
+  <remap from="~input" to="/voxel_grid/output"/>
+      <rosparam>min_x: -0.1</rosparam>
+      <rosparam>max_x: 0.1</rosparam>
+      <rosparam>min_y: 0.5</rosparam>
+      <rosparam>max_y: 0.6</rosparam>
+      <rosparam>min_z: 0.1</rosparam>
+      <rosparam>max_z: 0.2</rosparam>
+  </node>
+
+
+
+
+
+</launch>
+
+
+
