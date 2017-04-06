@@ -6,7 +6,7 @@ To run program:
 
 In new terminal
 1) cd pcd_files
-2) rosrun pcl_ros pcd_to_pointcloud ck1_perpendicular.pcd 0.1
+2) rosrun pcl_ros pcd_to_pointcloud ck2_perpendicular.pcd 0.1
 
 
 -> Run object recognition package
