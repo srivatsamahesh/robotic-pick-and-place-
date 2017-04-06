@@ -1,1 +1,16 @@
 # robotic-pick-and-place-
+
+To run program: 
+
+1) publish sample pointcloud on topic /cloud_pcd
+In new terminal
+1) cd pcd_files
+2) rosrun pcl_ros pointcloud_to_pcd ck1_perpendicular.pcd 0.1
+
+In new terminal
+1) roscd object_detection
+2) rosrun object_detection object_recognition 
+
+The model file is in the object_recognition package in the folder /model_files
+
+
