@@ -2,10 +2,14 @@
 
 To run program: 
 
-1) publish sample pointcloud on topic /cloud_pcd
+-> publish sample pointcloud on topic /cloud_pcd
+
 In new terminal
 1) cd pcd_files
 2) rosrun pcl_ros pointcloud_to_pcd ck1_perpendicular.pcd 0.1
+
+
+-> Run object recognition package
 
 In new terminal
 1) roscd object_detection
